@@ -22,6 +22,8 @@ class Customer(models.Model):
     content = models.TextField(verbose_name='咨询详情')
     tags = models.ManyToManyField('Tag',blank=True,null=True)
     consultant = models.ForeignKey('UserProfile')
+    status_choices = ((0, '已报名'), (1, '未报名'), (2, '已退学'))
+    status = models.SmallIntegerField(choices=status_choices)
     date = models.DateTimeField(auto_now_add=True)
     memo = models.TextField(blank=True,null=True)
 
@@ -50,6 +52,16 @@ class CustomerFollowUp(models.Model):
     '''客户跟进表'''
     customer = models.ForeignKey("Customer",on_delete=models.CASCADE)
     content = models.TextField('跟进的内容')
+    status_choices = (
+        (0,'绝无报名计划'),
+        (1,'一个月内报名'),
+        (2,'2周内报名'),
+        (3,'已报名其它机构'),
+    )
+    status = models.SmallIntegerField(choices=status_choices)
+
+
+
     consultant = models.ForeignKey('UserProfile',on_delete=models.CASCADE)
     intention_choices = (('0','2周内包名'),
                          (1, '1个月以内包名'),
