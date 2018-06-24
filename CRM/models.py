@@ -28,8 +28,8 @@ class Customer(models.Model):
     def __str__(self):
         return self.qq
     class Meta:
-        verbose_name = "客户表"
-        verbose_name_plural = "客户表"
+        verbose_name = "客户"
+        verbose_name_plural = "客户"
 
 
 
@@ -63,8 +63,8 @@ class CustomerFollowUp(models.Model):
     def __str__(self):
         return "<%s : %s>" % (self.customer.qq,self.intention)
     class Meta:
-        verbose_name = "客户跟进表"
-        verbose_name_plural = "客户跟进表"
+        verbose_name = "客户跟进"
+        verbose_name_plural = "客户跟进"
 
 
 
@@ -76,8 +76,8 @@ class Course(models.Model):
     period = models.PositiveSmallIntegerField(verbose_name='周期(月)')
     outline = models.TextField()
     class Meta:
-        verbose_name = "课程表"
-        verbose_name_plural = "课程表"
+        verbose_name = "课程"
+        verbose_name_plural = "课程"
 
 
     def __str__(self):
@@ -111,8 +111,8 @@ class ClassList(models.Model):
         return "%s  %s  %s" %(self.branch,self.course,self.semester)
     class Meta:
         unique_together = ('branch','course','semester')
-        verbose_name = "班级表"
-        verbose_name_plural = "班级表"
+        verbose_name = "班级"
+        verbose_name_plural = "班级"
 
 class CourseRecord(models.Model):
     '''上课记录表'''
@@ -129,8 +129,8 @@ class CourseRecord(models.Model):
 
     class Meta:
         unique_together = ("from_class","day_num")
-        verbose_name = "上课记录表"
-        verbose_name_plural = "上课记录表"
+        verbose_name = "上课记录"
+        verbose_name_plural = "上课记录"
 class StudyRecord(models.Model):
     '''学习记录'''
     student = models.ForeignKey("Enrollment",on_delete=models.CASCADE)
@@ -160,8 +160,9 @@ class StudyRecord(models.Model):
     def __str__(self):
         return "%s %s %s" % (self.student,self.course_record,self.score)
     class Meta:
-        verbose_name = "学习记录表"
-        verbose_name_plural = "学习记录表"
+        unique_together = ('student','course_record')
+        verbose_name = "学习记录"
+        verbose_name_plural = "学习记录"
 class Enrollment(models.Model):
     '''报名表'''
     customer = models.ForeignKey('Customer',on_delete=models.CASCADE)
@@ -175,8 +176,8 @@ class Enrollment(models.Model):
         return "%s %s" % (self.customer,self.enrolled_class)
     class Meta:
         unique_together = ("customer","enrolled_class")
-        verbose_name = "报名表"
-        verbose_name_plural = "报名表"
+        verbose_name = "报名"
+        verbose_name_plural = "报名"
 class Payment(models.Model):
     "付款表"
     customer = models.ForeignKey("Customer",on_delete=models.CASCADE)
@@ -187,8 +188,8 @@ class Payment(models.Model):
     def __str__(self):
         return '%s %s' % (self.customer,self.amount)
     class Meta:
-        verbose_name = "付款表"
-        verbose_name_plural = "付款表"
+        verbose_name = "缴费记录"
+        verbose_name_plural = "缴费记录"
 
 class UserProfile(models.Model):
     '''账号表'''
@@ -199,12 +200,12 @@ class UserProfile(models.Model):
         return self.name
     class Meta:
         #verbose_name = "账号表"
-        verbose_name_plural = "账号表"
+        verbose_name_plural = "账号"
 class Role(models.Model):
     '''角色表'''
     name = models.CharField(max_length=32,unique=True)
     def __str__(self):
         return self.name
     class Meta:
-        verbose_name = "角色表"
-        verbose_name_plural = "角色表"
+        verbose_name = "角色"
+        verbose_name_plural = "角色"
