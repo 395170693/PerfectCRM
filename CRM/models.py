@@ -76,20 +76,86 @@ class ClassList(models.Model):
     class_type = models.SmallIntegerField(choices=class_type_choices,verbose_name='班级类型')
     semester = models.PositiveSmallIntegerField(verbose_name='学期')
     teachers = models.ManyToManyField('UserProfile')
+    start_date = models.DateField(verbose_name='开班日期')
+    end_date = models.DateField(verbose_name='截止日期',blank=True,null=True)
+    def __str__(self):
+        return "%s  %s  %s" %(self.branch,self.course,self.semester)
+    class Meta:
+        unique_together = ('branch','course','semester')
 
 
 
 class CourseRecord(models.Model):
     '''上课记录表'''
-    pass
+    from_class = models.ForeignKey('ClassList',verbose_name='班级')
+    day_num = models.PositiveSmallIntegerField(verbose_name='第几节（天）')
+    teacher = models.ForeignKey('UserProfile')
+    has_homework = models.BooleanField(default=True)
+    homework_title = models.CharField(max_length=12,blank=True,null=True)
+    homework_content = models.TextField(blank=True,null=True)
+    outline = models.TextField("本节课程的大纲")
+    date = models.DateField(auto_now_add=True)
+    def __str__(self):
+        return "%s %s" % (self.from_class,self.day_num)
+
+    class Meta:
+        unique_together = ("from_class","day_num")
+
 
 class StudyRecord(models.Model):
     '''学习记录'''
-    pass
+    student = models.ForeignKey("Enrollment")
+    course_record = models.ForeignKey('CourseRecord')
+    attendance_choice = ((0,'已签到'),
+                         (1, '迟到'),
+                         (2, '缺勤'),
+                         (3, '早退'),
+                                )
+    attendance = models.SmallIntegerField(choices=attendance_choice,default=0)
+
+    score_choices = ((100,"A+"),
+                     (90, "A"),
+                     (85, "B+"),
+                     (80, "B"),
+                     (75, "B-+"),
+                     (70, "C+"),
+                     (60, "C"),
+                     (40, "C-"),
+                     (-50, "D"),
+                     (-100, "COPY"),
+                     (0, "N/A"),
+                     )
+    score = models.SmallIntegerField(choices=attendance_choice)
+    memo = models.TextField(blank=True,null=True)
+    date = models.DateField(auto_now_add=True)
+    def __str__(self):
+        return "%s %s %s" % (self.student,self.course_record,self.score)
+
 
 class Enrollment(models.Model):
     '''报名表'''
-    pass
+    customer = models.ForeignKey('Customer')
+    enrolled_class = models.ForeignKey("ClassList",verbose_name="所报班级")
+    consultanr = models.ForeignKey("UserProfile",verbose_name="课程顾问")
+    contract_agreed = models.BooleanField(default=False,verbose_name="学员已同意合同条款")
+    contract_approved = models.BooleanField(default=False,verbose_name="合同已经审核")
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "%s %s" % (self.customer,self.enrolled_class)
+    class Meta:
+        unique_together = ("customer","enrolled_class")
+
+class Payment(models.Model):
+    customer = models.ForeignKey("Customer")
+    course = models.ForeignKey("Course",verbose_name="所报课程")
+    amount  = models.PositiveIntegerField(verbose_name="数额",default=500)
+    consultant = models.ForeignKey("UserProfile")
+    date = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return '%s %s' % (self.customer,self.amount)
+
+
 
 class UserProfile(models.Model):
     '''账号表'''
@@ -97,4 +163,6 @@ class UserProfile(models.Model):
 
 class Role(models.Model):
     '''角色表'''
-    pass
+    name = models.CharField(max_length=32,unique=True)
+    def __str__(self):
+        return self.name
