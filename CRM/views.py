@@ -6,6 +6,6 @@ def index(request):
 
 def customer_list(request):
     return render(request,'customers.html')
-
-def stu_index(request):
-    return render(request,'stu_index.html')
+#
+# def stu_index(request):
+#     return render(request,'stu_index.html')
