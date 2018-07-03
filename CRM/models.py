@@ -18,12 +18,12 @@ class Customer(models.Model):
                     )
     source = models.SmallIntegerField(choices=source_choices)
     referral_from = models.CharField(verbose_name='转介绍人qq',max_length=64,blank=True,null=True)
-    consult_course = models.ForeignKey("Course",verbose_name='咨询课程')
+    consult_course = models.ForeignKey("Course",verbose_name='咨询课程',on_delete=models.CASCADE)
     content = models.TextField(verbose_name='咨询详情')
-    tags = models.ManyToManyField('Tag',blank=True,null=True)
-    consultant = models.ForeignKey('UserProfile')
+    tags = models.ManyToManyField('Tag')
+    consultant = models.ForeignKey('UserProfile',on_delete=models.CASCADE)
     status_choices = ((0, '已报名'), (1, '未报名'), (2, '已退学'))
-    status = models.SmallIntegerField(choices=status_choices)
+    status = models.SmallIntegerField(choices=status_choices,default=0)
     date = models.DateTimeField(auto_now_add=True)
     memo = models.TextField(blank=True,null=True)
 
@@ -58,7 +58,7 @@ class CustomerFollowUp(models.Model):
         (2,'2周内报名'),
         (3,'已报名其它机构'),
     )
-    status = models.SmallIntegerField(choices=status_choices)
+    status = models.SmallIntegerField(choices=status_choices,default=0)
 
 
 
@@ -205,9 +205,9 @@ class Payment(models.Model):
 
 class UserProfile(models.Model):
     '''账号表'''
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
-    roles = models.ManyToManyField("Role",blank=True,null=True)
+    roles = models.ManyToManyField("Role")
     def __str__(self):
         return self.name
     class Meta:
@@ -216,8 +216,17 @@ class UserProfile(models.Model):
 class Role(models.Model):
     '''角色表'''
     name = models.CharField(max_length=32,unique=True)
+    menus = models.ManyToManyField('Menu',blank=True)
     def __str__(self):
         return self.name
     class Meta:
         verbose_name = "角色"
         verbose_name_plural = "角色"
+
+class Menu(models.Model):
+    '''菜单'''
+    name = models.CharField(max_length=32)
+    url_name = models.CharField(max_length=64)
+
+    def __str__(self):
+      return  self.name
