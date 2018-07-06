@@ -5,7 +5,7 @@ def index(request):
     return render(request,'index.html')
 
 def customer_list(request):
-    return render(request,'customers.html')
+    return render(request,'sales/customers.html')
 #
 # def stu_index(request):
 #     return render(request,'stu_index.html')
