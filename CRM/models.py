@@ -8,13 +8,13 @@ class Customer(models.Model):
     qq = models.CharField(max_length=64,unique=True)
     qq_name = models.CharField(max_length=64,blank=True,null=True)
     phone = models.CharField(max_length=64,blank=True,null=True)
-    source_choices = (('0','转介绍'),
-                      ('1', 'QQ群'),
-                      ('2', '官网'),
-                      ('3', '百度推广'),
-                      ('4', '51CTO'),
-                      ('5', '知乎'),
-                      ('6', '市场推广'),
+    source_choices = ((0,'转介绍'),
+                      (1, 'QQ群'),
+                      (2, '官网'),
+                      (3, '百度推广'),
+                      (4, '51CTO'),
+                      (5, '知乎'),
+                      (6, '市场推广'),
                     )
     source = models.SmallIntegerField(choices=source_choices)
     referral_from = models.CharField(verbose_name='转介绍人qq',max_length=64,blank=True,null=True)
