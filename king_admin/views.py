@@ -4,4 +4,4 @@ from django.shortcuts import render
 
 
 def index(request):
-    return render(request,'king_admin/index.html')
+    return render(request,'king_admin/table_index.html')
