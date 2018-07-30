@@ -27,4 +27,4 @@ def register(model_class,admin_class=None):
     enabled_admins[model_class._meta.app_label][model_class._meta.model_name] = admin_class
 
 register(models.Customer,CustomerAdmin)
-# register(models.CustomerFollowUp,CustomerFollowUpAdmin)
+register(models.CustomerFollowUp,CustomerFollowUpAdmin)
