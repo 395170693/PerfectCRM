@@ -14,11 +14,6 @@ class CustomerAdmin(BaseAdmin):
 class CustomerFollowUpAdmin(BaseAdmin):
     list_display = ('customer','consultant','date')
 
-
-
-
-
-
 def register(model_class,admin_class=None):
     if model_class._meta.app_label not in enabled_admins:
         enabled_admins[model_class._meta.app_label] = {}
