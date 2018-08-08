@@ -9,7 +9,7 @@ class BaseAdmin(object):
 
 
 class CustomerAdmin(BaseAdmin):
-    list_display = ['qq','name']
+    list_display = ['qq','name','source','consultant','date','consult_course','status']
 
 class CustomerFollowUpAdmin(BaseAdmin):
     list_display = ('customer','consultant','date')
