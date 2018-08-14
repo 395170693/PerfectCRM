@@ -30,7 +30,7 @@ def build_table_row(obj,admin_class):
 @register.simple_tag
 def render_page_ele(loop_counter,query_sets):
 
-    if abs(query_sets.number - loop_counter) <= 1:
+    if abs(query_sets.number - loop_counter) <= 5:
         ele_class = ''
         if query_sets.number == loop_counter:
             ele_class = "active"
