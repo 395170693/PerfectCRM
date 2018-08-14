@@ -18,7 +18,7 @@
                 </tr>
                 </thead>
             <tbody>
-            {% get_query_sets admin_class as query_sets %}
+{#             {% get_query_sets admin_class as query_sets %}#}
                 {% for obj in query_sets %}
                     <tr>
                         {% build_table_row obj admin_class %}
@@ -26,6 +26,46 @@
                 {% endfor %}
             </tbody>
             </table>
+
+{#        <div class="pagination">#}
+{#            <span class="step-links">#}
+{#                {% if query_sets.has_previous %}#}
+{#                    <a href="?page=1">&laquo; first</a>#}
+{#                    <a href="?page={{ query_sets.previous_page_number }}">previous</a>#}
+{#                {% endif %}#}
+{##}
+{#                <span class="current">#}
+{#                    Page {{ query_sets.number }} of {{ query_sets.paginator.num_pages }}.#}
+{#                </span>#}
+{##}
+{#                {% if query_sets.has_next %}#}
+{#                    <a href="?page={{ query_sets.next_page_number }}">next</a>#}
+{#                    <a href="?page={{ query_sets.paginator.num_pages }}">last &raquo;</a>#}
+{#                {% endif %}#}
+{#            </span>#}
+{#        </div>#}
+
+
+        <nav>
+            <ul class="pagination">
+                {% if query_sets.has_previous %}
+                    <a href="?page=1">&laquo; 首页</a>
+                    <a href="?page={{ query_sets.previous_page_number }}">上一页</a>
+                {% endif %}
+
+                {% for loop_counter in query_sets.paginator.page_range %}
+                    {% render_page_ele loop_counter query_sets  %}
+                {% endfor %}
+
+                {% if query_sets.has_next %}
+                    <a href="?page={{ query_sets.next_page_number }}">下一页</a>
+                    <a href="?page={{ query_sets.paginator.num_pages }}">尾页 &raquo;</a>
+                {% endif %}
+            </ul>
+        </nav>
+
+
+
         </div>
     </div>
 {% endblock %}

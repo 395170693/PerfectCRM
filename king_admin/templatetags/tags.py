@@ -26,3 +26,14 @@ def build_table_row(obj,admin_class):
             column_date = column_date.strftime("%Y-%m-%d %H:%M:%S")
         row_ele += "<td>%s</td>" % (column_date)
     return mark_safe(row_ele)
+
+@register.simple_tag
+def render_page_ele(loop_counter,query_sets):
+
+    if abs(query_sets.number - loop_counter) <= 1:
+        ele_class = ''
+        if query_sets.number == loop_counter:
+            ele_class = "active"
+        ele = '''<li class=%s><a href="?page=%s">%s</a></li>''' % (ele_class,loop_counter,loop_counter)
+        return mark_safe(ele)
+    return ''
