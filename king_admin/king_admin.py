@@ -5,12 +5,13 @@ from CRM import models
 enabled_admins = {}
 class BaseAdmin(object):
     list_display = []
-    list_filter = []
+    list_filters = []
 
 
 class CustomerAdmin(BaseAdmin):
     list_display = ['qq','name','source','consultant','date','consult_course','status']
-
+    list_filters = ['source','consultant','consult_course','status']
+    list_per_page = 2
 class CustomerFollowUpAdmin(BaseAdmin):
     list_display = ('customer','consultant','date')
 
