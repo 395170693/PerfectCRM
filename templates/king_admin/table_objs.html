@@ -21,9 +21,6 @@
             </form>
         </div>
 
-
-
-
             <table class="table table-hover">
                 <thead>
                 <tr>
@@ -32,6 +29,13 @@
                     {% endfor %}
                 </tr>
                 </thead>
+                <tfoot>
+                <tr>
+                    <td>
+                        总计{{ query_sets.paginator.count }}条
+                    </td>
+                </tr>
+                </tfoot>
             <tbody>
                 {% for obj in query_sets %}
                     <tr>
@@ -50,8 +54,10 @@
                 {% endif %}
 
                 {% for loop_counter in query_sets.paginator.page_range %}
-                    {% render_page_ele loop_counter query_sets  %}
+                    {% render_page_ele loop_counter query_sets filter_conditions %}
                 {% endfor %}
+
+                {% build_paginators  query_sets filter_conditions%}
 
                 {% if query_sets.has_next %}
                     <li class=""><a href="?page={{ query_sets.next_page_number }}">下一页</a></li>

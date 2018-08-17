@@ -29,13 +29,22 @@ def build_table_row(obj,admin_class):
     return mark_safe(row_ele)
 
 @register.simple_tag
-def render_page_ele(loop_counter,query_sets):
+def render_page_ele(loop_counter,query_sets,filter_conditions):
+    filters = ''
+    for k,v in filter_conditions.items():
+        filters += "&%s=%s" % (k,v)
+    if loop_counter < 3 or loop_counter > query_sets.paginator.num_pages -2:#代表显示前2页以及最后两页码
+        ele_class = ''
+        if query_sets.number == loop_counter:
+            ele_class = "active"
+        ele = '''<li class=%s><a href="?page=%s%s">%s</a></li>''' % (ele_class,loop_counter,filters,loop_counter)
+        return mark_safe(ele)
 
     if abs(query_sets.number - loop_counter) <= 5:
         ele_class = ''
         if query_sets.number == loop_counter:
             ele_class = "active"
-        ele = '''<li class=%s><a href="?page=%s">%s</a></li>''' % (ele_class,loop_counter,loop_counter)
+        ele = '''<li class=%s><a href="?page=%s%s">%s</a></li>''' % (ele_class,loop_counter,filters,loop_counter)
         return mark_safe(ele)
     return ''
 
@@ -58,10 +67,6 @@ def render_filter_ele(condtion,admin_class,filter_conditions):
                 selected = 'selected'
             select_ele += '''<option value='%s' %s>%s</option>''' % (choice_item[0],selected,choice_item[1])
             selected = ''
-
-
-
-
     select_ele += "</select>"
     return mark_safe(select_ele)
 

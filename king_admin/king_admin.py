@@ -11,8 +11,9 @@ class BaseAdmin(object):
 class CustomerAdmin(BaseAdmin):
     list_display = ['qq','name','source','consultant','date','consult_course','status']
     list_filters = ['source','consultant','consult_course','status']
-    list_per_page = 2
+    list_per_page = 1
 class CustomerFollowUpAdmin(BaseAdmin):
+    list_per_page = 1
     list_display = ('customer','consultant','date')
 
 def register(model_class,admin_class=None):
