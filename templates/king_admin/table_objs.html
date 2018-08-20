@@ -53,11 +53,11 @@
                     <li class=""><a href="?page={{ query_sets.previous_page_number }}">上一页</a></li>
                 {% endif %}
 
-                {% for loop_counter in query_sets.paginator.page_range %}
-                    {% render_page_ele loop_counter query_sets filter_conditions %}
-                {% endfor %}
+{#                {% for loop_counter in query_sets.paginator.page_range %}#}
+{#                    {% render_page_ele loop_counter query_sets filter_conditions %}#}
+{#                {% endfor %}#}
 
-                {% build_paginators  query_sets filter_conditions%}
+                    {% build_paginators  query_sets filter_conditions%}
 
                 {% if query_sets.has_next %}
                     <li class=""><a href="?page={{ query_sets.next_page_number }}">下一页</a></li>
