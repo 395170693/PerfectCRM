@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import importlib
-from king_admin.utils import table_filter
+from king_admin.utils import table_filter,table_sort
 
 
 # Create your views here.
@@ -13,10 +13,13 @@ def index(request):
 def display_table_objs(request,app_name,table_name):
     #print ('-------------->',app_name,table_name)
     admin_class = king_admin.enabled_admins[app_name][table_name]
+
         # models_module = importlib.import_module('%s.model'%(app_name))
         # model_obj = getattr(models_module,table_name)
         #object_list = admin_class.model.objects.all()
-    object_list,filter_conditions = table_filter(request,admin_class)
+    object_list,filter_conditions = table_filter(request,admin_class) #过滤都得结果
+
+    object_list = table_sort(request,admin_class,object_list) #排序后的结果
 
     paginator = Paginator(object_list, admin_class.list_per_page) # Show 25 contacts per pag
     page = request.GET.get('page')

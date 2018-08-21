@@ -10,7 +10,7 @@ class BaseAdmin(object):
 
 
 class CustomerAdmin(BaseAdmin):
-    list_display = ['qq','name','source','consultant','date','consult_course','status']
+    list_display = ['id','qq','name','source','consultant','date','consult_course','status']
     list_filters = ['source','consultant','consult_course','status']
     list_per_page = 5
 class CustomerFollowUpAdmin(BaseAdmin):

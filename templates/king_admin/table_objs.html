@@ -25,7 +25,7 @@
                 <thead>
                 <tr>
                     {% for column in admin_class.list_display %}
-                        <th>{{ column }}</th>
+                        <th><a href="?o={{ column }}">{{ column }}</a></th>
                     {% endfor %}
                 </tr>
                 </thead>
