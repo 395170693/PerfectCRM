@@ -29,7 +29,7 @@ def build_table_row(obj,admin_class):
     return mark_safe(row_ele)
 
 @register.simple_tag
-def build_paginators(query_sets,filter_conditions):
+def build_paginators(query_sets,filter_conditions,previous_orderby):
     page_btns= ''
     filters = ''
     for k, v in filter_conditions.items():
@@ -42,8 +42,8 @@ def build_paginators(query_sets,filter_conditions):
             if query_sets.number == page_num:
                 added_dot_ele = False
                 ele_class = "active"
-            page_btns += '''<li class=%s><a href="?page=%s%s">%s</a></li>''' %(
-            ele_class, page_num, filters, page_num)
+            page_btns += '''<li class=%s><a href="?page=%s%s&o=%s">%s</a></li>''' %(
+            ele_class, page_num, filters,previous_orderby,page_num)
         else:  # 显示...
             if added_dot_ele == False:
                 page_btns += '<li><a>...</a></li>'
@@ -109,4 +109,27 @@ def render_filter_ele(condtion,admin_class,filter_conditions):
     select_ele += "</select>"
     return mark_safe(select_ele)
 
+@register.simple_tag
+def build_table_header_column(column,orderby_key,filter_conditions):
+    filters = ''
+    for k, v in filter_conditions.items():
+        filters += "&%s=%s" % (k, v)
+    ele = '''<th><a href='?{filters}&o={orderby_key}'>{column}</a> \
+          {sort_icon}</th>'''
 
+    if orderby_key:
+        if orderby_key.startswith('-'):
+            sort_icon = "<span class='glyphicon glyphicon-chevron-up' aria-hidden='true'></span>"
+        else:
+            sort_icon = "<span class='glyphicon glyphicon-chevron-down' aria-hidden='true'></span>"
+        if orderby_key.strip('-') == column:#排序的就是当前字段
+            orderby_key=orderby_key
+
+        else:
+            sort_icon = ''
+            orderby_key=column
+    else:
+        sort_icon = ''
+        orderby_key = column
+    ele = ele.format(filters=filters,orderby_key=orderby_key, column=column,sort_icon=sort_icon)
+    return mark_safe(ele)

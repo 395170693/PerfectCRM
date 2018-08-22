@@ -9,6 +9,15 @@ def table_filter(request,admin_class):
     return admin_class.model.objects.filter(**filter_conditions),filter_conditions
 def table_sort(request,admin_class,objs):
     orderby_key = request.GET.get('o')
+    print(orderby_key)
     if orderby_key:
-        return objs.order_by(orderby_key)
-    return objs
+        res = objs.order_by(orderby_key)
+        if orderby_key.startswith('-'):
+            orderby_key = orderby_key.strip('-')
+        else:
+            orderby_key = '-%s' % orderby_key
+    else:
+        res = objs
+    return res,orderby_key
+
+def table_seach(request,admin_class,object_list):
