@@ -29,7 +29,7 @@ def build_table_row(obj,admin_class):
     return mark_safe(row_ele)
 
 @register.simple_tag
-def build_paginators(query_sets,filter_conditions,previous_orderby):
+def build_paginators(query_sets,filter_conditions,previous_orderby,search_text):
     page_btns= ''
     filters = ''
     for k, v in filter_conditions.items():
@@ -42,8 +42,8 @@ def build_paginators(query_sets,filter_conditions,previous_orderby):
             if query_sets.number == page_num:
                 added_dot_ele = False
                 ele_class = "active"
-            page_btns += '''<li class=%s><a href="?page=%s%s&o=%s">%s</a></li>''' %(
-            ele_class, page_num, filters,previous_orderby,page_num)
+            page_btns += '''<li class=%s><a href="?page=%s%s&o=%s&_q=%s">%s</a></li>''' %(
+            ele_class, page_num, filters,previous_orderby,page_num,search_text)
         else:  # 显示...
             if added_dot_ele == False:
                 page_btns += '<li><a>...</a></li>'

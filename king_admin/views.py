@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import importlib
-from king_admin.utils import table_filter,table_sort
+from king_admin.utils import table_filter,table_sort,table_seach
 
 
 # Create your views here.
@@ -37,4 +37,6 @@ def display_table_objs(request,app_name,table_name):
                                                         "query_sets":query_sets,
                                                         'filter_conditions':filter_conditions,
                                                         'orderby_key':orderby_key,
-                                                        'previous_orderby':request.GET.get('o') or ''})
+                                                        'previous_orderby':request.GET.get('o') or '',
+                                                        "search_text":request.GET.get('_q','')
+                                                        })

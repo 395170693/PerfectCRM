@@ -6,6 +6,7 @@ enabled_admins = {}
 class BaseAdmin(object):
     list_display = []
     list_filters = []
+    search_fields = []
     list_per_page = 5
 
 
@@ -13,6 +14,7 @@ class CustomerAdmin(BaseAdmin):
     list_display = ['id','qq','name','source','consultant','date','consult_course','status']
     list_filters = ['source','consultant','consult_course','status']
     list_per_page = 5
+    search_fields = ['qq','name','consultant__name']
 class CustomerFollowUpAdmin(BaseAdmin):
     list_display = ('customer','consultant','date')
 

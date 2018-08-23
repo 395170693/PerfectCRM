@@ -1,8 +1,11 @@
+
+from django.db.models import Q
 def table_filter(request,admin_class):
     '''进行条件过滤，并且返回过滤后的数据'''
     filter_conditions = {}
+    keywords = ['page','o','_q']
     for k,v in request.GET.items():
-        if k == "page" or k == 'o':#保留的分页和排序关键字
+        if k in keywords:#保留的分页和排序关键字
             continue
         if v:
             filter_conditions[k] = v
@@ -21,3 +24,10 @@ def table_sort(request,admin_class,objs):
     return res,orderby_key
 
 def table_seach(request,admin_class,object_list):
+    search_key = request.GET.get('_q','')
+    q_obj = Q()
+    q_obj.connector = 'OR'
+    for column in admin_class.search_fields:
+        q_obj.children.append(("%s__contains" % column,search_key))
+    res = object_list.filter(q_obj)
+    return res
