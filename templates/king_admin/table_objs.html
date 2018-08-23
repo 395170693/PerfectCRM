@@ -11,10 +11,10 @@
         <div class="panel-body">
         <div class="row">
             <form class="" method='get'>
-                {% for condtion in admin_class.list_filters %}
+                {% for filter_filed in admin_class.list_filters %}
                     <div class="col-lg-2">
-                        <span>{{ condtion }}</span>
-                        {% render_filter_ele condtion admin_class filter_conditions %}
+                        <span>{{ filter_filed }}</span>
+                        {% render_filter_ele filter_filed admin_class filter_conditions %}
                     </div>
                 {% endfor %}
                 <button type="submit" class="btn btn-success">检索</button>
