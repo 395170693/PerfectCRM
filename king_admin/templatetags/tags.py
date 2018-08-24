@@ -1,6 +1,7 @@
 from django import template
 register=template.Library()
 from django.db import models
+from django.utils.timezone import datetime,timedelta#导入时区相关时间
 from django.utils.safestring import mark_safe
 
 
@@ -15,9 +16,9 @@ def get_query_sets(admin_class):
     return admin_class.model.objects.all()
 
 @register.simple_tag
-def build_table_row(obj,admin_class):
+def build_table_row(request,obj,admin_class):
     row_ele = ''
-    for column in admin_class.list_display:
+    for index,column in enumerate(admin_class.list_display):
         field_obj = obj._meta.get_field(column)
         if field_obj.choices:
             column_date = getattr(obj,"get_%s_display" % column)()
@@ -25,6 +26,11 @@ def build_table_row(obj,admin_class):
             column_date = getattr(obj, column)
         if type(column_date).__name__ == 'datetime':
             column_date = column_date.strftime("%Y-%m-%d %H:%M:%S")
+        if index == 0:#添加a标签，可以跳转到修改页码
+            column_date = "<a href='{request_path}{obj_id}/change/'>{data}</a>".format(request_path=request.path,
+                                                                                        obj_id = obj.id,
+                                                                                        data = column_date,
+                                                                                        )
         row_ele += "<td>%s</td>" % (column_date)
     return mark_safe(row_ele)
 
@@ -90,7 +96,7 @@ def render_page_ele(loop_counter,query_sets,filter_conditions):
 @register.simple_tag
 def render_filter_ele(filter_filed,admin_class,filter_conditions):
     # print(admin_class.model._meta.get_field(condtion))
-    select_ele = "<select class='form-control' name='%s'><option value=''>请选择</option>" % filter_filed
+    select_ele = "<select class='form-control' name='{filter_filed}'><option value=''>请选择</option>"
     field_obj = admin_class.model._meta.get_field(filter_filed)
     if field_obj.choices:
         selected = ''
@@ -107,8 +113,25 @@ def render_filter_ele(filter_filed,admin_class,filter_conditions):
             select_ele += '''<option value='%s' %s>%s</option>''' % (choice_item[0],selected,choice_item[1])
             selected = ''
     if type(field_obj).__name__ in ['DateField','DateTimeField']:
-        pass
+        date_els = []
+        today_ele = datetime.now().date()
+        date_els.append(['今天',datetime.now().date()])
+        date_els.append(['昨天',today_ele - timedelta(days=1)])
+        date_els.append(['近7天',today_ele - timedelta(days=7)])
+        date_els.append(['本月',today_ele.replace(day=1)])
+        date_els.append(['近30天',today_ele - timedelta(days=30)])
+        date_els.append(['近90天',today_ele - timedelta(days=90)])
+        date_els.append(['近180前',today_ele - timedelta(days=180)])
+        date_els.append(['近365一年',today_ele - timedelta(days=365)])
+        date_els.append(['年初',today_ele.replace(month=1,day=1)])
+        selected = []
+        for item in date_els:
+            select_ele += '''<option value='%s' %s>%s</option>''' % (item[1], selected, item[0])
+        filter_filed_name = "%s__gte" % filter_filed
+    else:
+        filter_filed_name = filter_filed
     select_ele += "</select>"
+    select_ele = select_ele.format(filter_filed=filter_filed_name)
     return mark_safe(select_ele)
 
 @register.simple_tag
