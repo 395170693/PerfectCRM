@@ -9,7 +9,9 @@ from django.utils.safestring import mark_safe
 
 @register.simple_tag
 def render_app_name(admin_class):
+    print(admin_class.model._meta.verbose_name)
     return admin_class.model._meta.verbose_name
+
 
 @register.simple_tag
 def get_query_sets(admin_class):
