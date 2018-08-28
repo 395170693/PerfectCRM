@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import importlib
 from king_admin.utils import table_filter,table_sort,table_seach
+from king_admin.forms import create_model_form
 
 
 # Create your views here.
@@ -41,4 +42,8 @@ def display_table_objs(request,app_name,table_name):
                                                         "search_text":request.GET.get('_q','')
                                                         })
 def table_objs_change(request,app_name,table_name,obj_id):
-    return render(request,'king_admin/table_obj_change.html')
+    admin_class = king_admin.enabled_admins[app_name][table_name]
+    model_form_class = create_model_form(request,admin_class)
+    obj = admin_class.model.objects.get(id=obj_id)
+    form_obj = model_form_class(instance=obj)
+    return render(request,'king_admin/table_obj_change.html',{'form_obj':form_obj})
