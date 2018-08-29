@@ -10,10 +10,15 @@ class CustomerModelForm(ModelForm):
 
 def create_model_form(request,admin_class):
     '''动态生成modelform'''
+    def __new__(cls,*args,**kwargs):
+        for field_name,field_obj in cls.base_fields.items():
+            field_obj.widget.attrs['class'] = 'form-control'
+        return ModelForm.__new__(cls)
     class Meta:
         model = admin_class.model
         fields = '__all__'
-    attrs = {'Meta':Meta}
+    attrs = {'Meta':Meta,}
     _model_form_class = type('DynamicModelForm',(ModelForm,),attrs)
+    setattr(_model_form_class,'__new__',__new__)
     # setattr(_model_form_class,'Meta',Meta)
     return _model_form_class

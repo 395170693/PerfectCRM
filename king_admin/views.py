@@ -44,6 +44,13 @@ def display_table_objs(request,app_name,table_name):
 def table_objs_change(request,app_name,table_name,obj_id):
     admin_class = king_admin.enabled_admins[app_name][table_name]
     model_form_class = create_model_form(request,admin_class)
+
     obj = admin_class.model.objects.get(id=obj_id)
-    form_obj = model_form_class(instance=obj)
+    if request.method == 'POST':
+        form_obj = model_form_class(request.POST,instance=obj)
+        if form_obj.is_valid():
+            form_obj.save()
+    else:
+        # obj = admin_class.model.objects.get(id=obj_id)
+        form_obj = model_form_class(instance=obj)
     return render(request,'king_admin/table_obj_change.html',{'form_obj':form_obj})
