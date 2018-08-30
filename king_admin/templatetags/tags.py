@@ -160,3 +160,10 @@ def build_table_header_column(column,orderby_key,filter_conditions):
         orderby_key = column
     ele = ele.format(filters=filters,orderby_key=orderby_key, column=column,sort_icon=sort_icon)
     return mark_safe(ele)
+
+
+@register.simple_tag
+def get_model_name(admin_class):
+    model_name = admin_class.model._meta.verbose_name
+    print(model_name)
+    return model_name

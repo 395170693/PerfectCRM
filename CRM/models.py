@@ -30,8 +30,8 @@ class Customer(models.Model):
     def __str__(self):
         return self.qq
     class Meta:
-        verbose_name = "客户"
-        verbose_name_plural = "客户"
+        verbose_name = "客户信息"
+        verbose_name_plural = "客户信息"
 
 
 
