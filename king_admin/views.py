@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 import importlib
 from king_admin.utils import table_filter,table_sort,table_seach
@@ -62,6 +62,7 @@ def table_objs_add(request,app_name,table_name):
         form_obj = model_form_class(request.POST)
         if form_obj.is_valid():
             form_obj.save()
+            return redirect(request.path.replace('/add','/'))
     else:
         # obj = admin_class.model.objects.get(id=obj_id)
         form_obj = model_form_class()

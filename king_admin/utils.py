@@ -9,7 +9,9 @@ def table_filter(request,admin_class):
             continue
         if v:
             filter_conditions[k] = v
-    return admin_class.model.objects.filter(**filter_conditions),filter_conditions
+
+    return admin_class.model.objects.filter(**filter_conditions).order_by(admin_class.ordering if admin_class.ordering \
+           else '-id'),filter_conditions
 def table_sort(request,admin_class,objs):
     orderby_key = request.GET.get('o')
     print(orderby_key)
