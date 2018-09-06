@@ -23,6 +23,19 @@ def display_table_objs(request,app_name,table_name):
     object_list,orderby_key = table_sort(request,admin_class,object_list) #排序后的结果
 
     paginator = Paginator(object_list, admin_class.list_per_page) # Show 25 contacts per pag
+    # def get_page(self, number):
+    #     """
+    #     Return a valid page, even if the page argument isn't a number or isn't
+    #     in range.
+    #     """
+    #     try:
+    #         number = self.validate_number(number)
+    #     except PageNotAnInteger:
+    #         number = 1
+    #     except EmptyPage:
+    #         number = self.num_pages
+    #     return self.page(number)
+
     page = request.GET.get('page')
     query_sets = paginator.get_page(page)
     # try:
