@@ -66,7 +66,7 @@ def table_objs_change(request,app_name,table_name,obj_id):
     else:
         # obj = admin_class.model.objects.get(id=obj_id)
         form_obj = model_form_class(instance=obj)
-    return render(request,'king_admin/table_obj_change.html',{'form_obj':form_obj})
+    return render(request,'king_admin/table_obj_change.html',{'form_obj':form_obj,'admin_class':admin_class})
 def table_objs_add(request,app_name,table_name):
     admin_class = king_admin.enabled_admins[app_name][table_name]
     model_form_class = create_model_form(request,admin_class)

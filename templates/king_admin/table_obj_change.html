@@ -1,7 +1,14 @@
 {% extends 'king_admin/table_index.html' %}
 
 {% load tags %}
-
+{% block extra-css-resources %}
+    <style type="text/css">
+        .filter-select-box{
+            height: 250px!important;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
 {% block container %}
 change table
     <form class="form-horizontal" method="post">
@@ -16,7 +23,20 @@ change table
                 {{ field.label }}
             {% endif %}
         </label>
-        <div class="col-sm-6">
+        <div class="col-sm-6" >
+            {% if field.name in admin_class.filter_horizontal %}
+                <div class="col-md-5">
+                    <select multiple class="filter-select-box" >
+
+                    </select>
+                </div>
+                <div class="col-md-1">
+                箭头
+                </div>
+                <div class="col-md-5">
+                    <select multiple class="filter-select-box"></select>
+                </div>
+            {% endif %}
 {#          <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
             {{field}}
         </div>
