@@ -167,3 +167,32 @@ def get_model_name(admin_class):
     model_name = admin_class.model._meta.verbose_name
     print(model_name)
     return model_name
+@register.simple_tag
+def get_m2m_obj_list(admin_class,field,form_obj):
+    '''返回已选择的m2m数据'''
+    #表结构对象的某个字段
+    field_obj = getattr(admin_class.model,field.name)
+    all_obj_list = field_obj.rel.to.objects.all()
+    #单条数据的对象中的某个字段
+    obj_instance_field = getattr(form_obj.instance,field.name)
+    selected_obj_list = obj_instance_field.all()
+
+    standly_obj_list = []
+    for obj in all_obj_list:
+        if obj not in selected_obj_list:
+            standly_obj_list.append(obj)
+    print('======================================================= %s' % standly_obj_list)
+    return standly_obj_list
+@register.simple_tag
+def print_obj_methods(obj):
+    print('----------------debug %s----------------' % obj)
+    print(dir(obj))
+
+@register.simple_tag
+def get_m2m_select_obj_list(form_obj,field):
+    '''返回已选择的m2m数据'''
+
+    field_obj = getattr(form_obj.instance,field.name)
+    print(field_obj.all())
+    print('=======================================================')
+    return field_obj.all()

@@ -6,6 +6,7 @@
         .filter-select-box{
             height: 250px!important;
             width: 100%;
+            border-radius:3px;
         }
     </style>
 {% endblock %}
@@ -24,21 +25,32 @@ change table
             {% endif %}
         </label>
         <div class="col-sm-6" >
-            {% if field.name in admin_class.filter_horizontal %}
+            {% if field.name in admin_class.filter_horizontal  %}
                 <div class="col-md-5">
+                    {% get_m2m_obj_list admin_class field form_obj as m2m_obj_list %}
                     <select multiple class="filter-select-box" >
-
+                        {% for obj in m2m_obj_list %}
+                        <option value="{{ obj.id }}">{{ obj }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-1">
                 箭头
                 </div>
                 <div class="col-md-5">
-                    <select multiple class="filter-select-box"></select>
+                    {% get_m2m_select_obj_list  form_obj  field  as select_obj_list %}
+                    <select multiple class="filter-select-box">
+                        {% for obj in select_obj_list %}
+                        <option value="{{ obj.id }}">{{ obj }}</option>
+                        {% endfor %}
+                    </select>
+
+
                 </div>
-            {% endif %}
+            {% else %}
 {#          <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
-            {{field}}
+                {{field}}
+            {% endif %}
         </div>
       </div>
     {% endfor %}
