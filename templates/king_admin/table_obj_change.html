@@ -5,11 +5,14 @@
     <style type="text/css">
         .filter-select-box{
             height: 250px!important;
-            width: 100%;
-            border-radius:3px;
+            width:100%;
+            border-radius: 2px;
         }
     </style>
 {% endblock %}
+
+
+
 {% block container %}
 change table
     <form class="form-horizontal" method="post">
@@ -24,31 +27,29 @@ change table
                 {{ field.label }}
             {% endif %}
         </label>
-        <div class="col-sm-6" >
-            {% if field.name in admin_class.filter_horizontal  %}
-                <div class="col-md-5">
+        <div class="col-sm-6">
+{#          <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
+            {% if  field.name in admin_class.filter_horizontal %}
+                <div class="col-lg-5">
                     {% get_m2m_obj_list admin_class field form_obj as m2m_obj_list %}
-                    <select multiple class="filter-select-box" >
+                    <select id="id_{{ field.name }}_from"  multiple class="filter-select-box">
                         {% for obj in m2m_obj_list %}
-                        <option value="{{ obj.id }}">{{ obj }}</option>
+                            <option ondblclick="MoveElementTo(this,'id_{{ field.name }}_to','id_{{ field.name }}_from')" value="{{ obj.id }}">{{ obj }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-1">
-                箭头
+                <div class="col-lg-1">
+                    箭头
                 </div>
-                <div class="col-md-5">
-                    {% get_m2m_select_obj_list  form_obj  field  as select_obj_list %}
-                    <select multiple class="filter-select-box">
-                        {% for obj in select_obj_list %}
-                        <option value="{{ obj.id }}">{{ obj }}</option>
+                <div class="col-lg-5">
+                    {% get_m2m_selected_obj_list form_obj field as selected_obj_list %}
+                    <select id="id_{{ field.name }}_to" multiple class="filter-select-box">
+                        {% for obj in selected_obj_list %}
+                            <option ondblclick="MoveElementTo(this,'id_{{ field.name }}_from','id_{{ field.name }}_to')" value="{{ obj.id }}" >{{ obj }}</option>
                         {% endfor %}
                     </select>
-
-
                 </div>
             {% else %}
-{#          <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
                 {{field}}
             {% endif %}
         </div>
@@ -60,4 +61,13 @@ change table
             </div>
         </div>
     </form>
+    <script>
+        function MoveElementTo(ele,target_id,new_target_id) {
+            var opt_ele ="<option value='" + $(ele).val() + "'ondblclick=MoveElementTo(this,'" + target_id + "')>" + $(ele).text()
+            //$(ele).off().dblclick($(ele),parent_id)
+            //$(ele).appendTo("#" +target_id)
+            $("#" +target_id).append(opt_ele);
+            $(ele).remove();
+        }
+    </script>
 {% endblock %}
