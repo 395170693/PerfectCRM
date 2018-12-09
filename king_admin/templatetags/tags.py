@@ -172,7 +172,7 @@ def get_m2m_obj_list(admin_class,field,form_obj):
     '''返回已选择的m2m数据'''
     #表结构对象的某个字段
     field_obj = getattr(admin_class.model,field.name)
-    all_obj_list = field_obj.rel.to.objects.all()
+    all_obj_list = field_obj.rel.field.related_model.objects.all()
     #单条数据的对象中的某个字段
     obj_instance_field = getattr(form_obj.instance,field.name)
     selected_obj_list = obj_instance_field.all()
@@ -189,10 +189,16 @@ def print_obj_methods(obj):
     print(dir(obj))
 
 @register.simple_tag
-def get_m2m_select_obj_list(form_obj,field):
+def get_m2m_selected_obj_list(form_obj,field):
     '''返回已选择的m2m数据'''
-
+    print('123456789111111111111111111111111111111')
     field_obj = getattr(form_obj.instance,field.name)
     print(field_obj.all())
     print('=======================================================')
     return field_obj.all()
+
+# @register.simple_tag
+# def get_m2m_selected_obj_list(form_obj,field):
+#     #if form_obj.instance.id:
+#          field_obj = getattr(form_obj.instance,field.name)
+#     return field_obj.all()

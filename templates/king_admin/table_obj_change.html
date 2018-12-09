@@ -18,7 +18,7 @@ change table
     <form class="form-horizontal" method="post">
     {% csrf_token %}
         <span style="color: red">{{ form_obj.errors }}</span>
-         {%for field in form_obj %}
+         {% for field in form_obj %}
       <div class="form-group">
         <label class="col-sm-2 control-label" style="font-weight: normal">
             {% if field.field.required %}
@@ -28,26 +28,26 @@ change table
             {% endif %}
         </label>
         <div class="col-sm-6">
-{#          <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
+{#                  <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
             {% if  field.name in admin_class.filter_horizontal %}
                 <div class="col-lg-5">
                     {% get_m2m_obj_list admin_class field form_obj as m2m_obj_list %}
-                    <select id="id_{{ field.name }}_from"  multiple class="filter-select-box">
-                        {% for obj in m2m_obj_list %}
-                            <option ondblclick="MoveElementTo(this,'id_{{ field.name }}_to','id_{{ field.name }}_from')" value="{{ obj.id }}">{{ obj }}</option>
-                        {% endfor %}
-                    </select>
+                        <select id="id_{{ field.name }}_from"  multiple class="filter-select-box">
+                            {% for obj in m2m_obj_list %}
+                                <option ondblclick="MoveElementTo(this,'id_{{ field.name }}_to','id_{{ field.name }}_from')" value="{{ obj.id }}">{{ obj }}</option>
+                            {% endfor %}
+                        </select>
                 </div>
                 <div class="col-lg-1">
                     箭头
                 </div>
                 <div class="col-lg-5">
-                    {% get_m2m_selected_obj_list form_obj field as selected_obj_list %}
-                    <select id="id_{{ field.name }}_to" multiple class="filter-select-box">
-                        {% for obj in selected_obj_list %}
-                            <option ondblclick="MoveElementTo(this,'id_{{ field.name }}_from','id_{{ field.name }}_to')" value="{{ obj.id }}" >{{ obj }}</option>
-                        {% endfor %}
-                    </select>
+                    {% get_m2m_selected_obj_list  form_obj field as selected_obj_list %}
+                        <select id="id_{{ field.name }}_to" multiple class="filter-select-box">
+                            {% for obj in selected_obj_list %}
+                                <option ondblclick="MoveElementTo(this,'id_{{ field.name }}_from','id_{{ field.name }}_to')" value="{{ obj.id }}" >{{ obj }}</option>
+                            {% endfor %}
+                        </select>
                 </div>
             {% else %}
                 {{field}}
