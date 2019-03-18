@@ -3,7 +3,7 @@ register=template.Library()
 from django.db import models
 from django.utils.timezone import datetime,timedelta#导入时区相关时间
 from django.utils.safestring import mark_safe
-
+from django.core.exceptions import FieldDoesNotExist
 
 
 
@@ -21,19 +21,27 @@ def get_query_sets(admin_class):
 def build_table_row(request,obj,admin_class):
     row_ele = ''
     for index,column in enumerate(admin_class.list_display):
-        field_obj = obj._meta.get_field(column)
-        if field_obj.choices:
-            column_date = getattr(obj,"get_%s_display" % column)()
-        else:
-            column_date = getattr(obj, column)
-        if type(column_date).__name__ == 'datetime':
-            column_date = column_date.strftime("%Y-%m-%d %H:%M:%S")
-        if index == 0:#添加a标签，可以跳转到修改页码
-            column_date = "<a href='{request_path}{obj_id}/change/'>{data}</a>".format(request_path=request.path,
-                                                                                        obj_id = obj.id,
-                                                                                        data = column_date,
-                                                                                        )
-        row_ele += "<td>%s</td>" % (column_date)
+        try:
+            field_obj = obj._meta.get_field(column)
+            if field_obj.choices:
+                column_data = getattr(obj,"get_%s_display" % column)()
+            else:
+                column_data = getattr(obj, column)
+            if type(column_data).__name__ == 'datetime':
+                column_data = column_data.strftime("%Y-%m-%d %H:%M:%S")
+            if index == 0:#添加a标签，可以跳转到修改页码
+                column_data = "<a href='{request_path}{obj_id}/change/'>{data}</a>".format(request_path=request.path,
+                                                                                            obj_id = obj.id,
+                                                                                            data = column_data,
+                                                                                            )
+        except FieldDoesNotExist as e:
+            if hasattr(admin_class,column):
+                column_func = getattr(admin_class,column)
+                admin_class.instance = obj
+                admin_class.request = request
+                column_data = column_func()
+
+        row_ele += "<td>%s</td>" % (column_data)
     return mark_safe(row_ele)
 
 @register.simple_tag
@@ -137,7 +145,7 @@ def render_filter_ele(filter_filed,admin_class,filter_conditions):
     return mark_safe(select_ele)
 
 @register.simple_tag
-def build_table_header_column(column,orderby_key,filter_conditions):
+def build_table_header_column(column,orderby_key,filter_conditions,admin_class):
     filters = ''
     for k, v in filter_conditions.items():
         filters += "&%s=%s" % (k, v)
@@ -158,7 +166,13 @@ def build_table_header_column(column,orderby_key,filter_conditions):
     else:
         sort_icon = ''
         orderby_key = column
-    ele = ele.format(filters=filters,orderby_key=orderby_key, column=column,sort_icon=sort_icon)
+    try:
+        column_verbose_name = admin_class.model._meta.get_field(column).verbose_name.upper()
+    except FieldDoesNotExist as e:
+        column_verbose_name = getattr(admin_class,column).display_name.upper()
+        ele = '''<th><a href="javascript:void(0);">{column}</a></th>'''.format(column=column_verbose_name)
+        return mark_safe(ele)
+    ele = ele.format(filters=filters,orderby_key=orderby_key, column=column_verbose_name,sort_icon=sort_icon)
     return mark_safe(ele)
 
 
@@ -174,14 +188,16 @@ def get_m2m_obj_list(admin_class,field,form_obj):
     field_obj = getattr(admin_class.model,field.name)
     all_obj_list = field_obj.rel.field.related_model.objects.all()
     #单条数据的对象中的某个字段
-    obj_instance_field = getattr(form_obj.instance,field.name)
-    selected_obj_list = obj_instance_field.all()
-
+    if form_obj.instance.id:
+        obj_instance_field = getattr(form_obj.instance,field.name)
+        selected_obj_list = obj_instance_field.all()
+    else:
+        return all_obj_list
     standly_obj_list = []
     for obj in all_obj_list:
         if obj not in selected_obj_list:
             standly_obj_list.append(obj)
-    print('======================================================= %s' % standly_obj_list)
+    # print('======================================================= %s' % standly_obj_list)
     return standly_obj_list
 @register.simple_tag
 def print_obj_methods(obj):
@@ -191,11 +207,10 @@ def print_obj_methods(obj):
 @register.simple_tag
 def get_m2m_selected_obj_list(form_obj,field):
     '''返回已选择的m2m数据'''
-    print('123456789111111111111111111111111111111')
-    field_obj = getattr(form_obj.instance,field.name)
-    print(field_obj.all())
-    print('=======================================================')
-    return field_obj.all()
+    # print(form_obj.instance.id)
+    if form_obj.instance.id:
+        field_obj = getattr(form_obj.instance,field.name)
+        return field_obj.all()
 
 # @register.simple_tag
 # def get_m2m_selected_obj_list(form_obj,field):

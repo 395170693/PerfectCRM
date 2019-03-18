@@ -1,10 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import (
+    BaseUserManager, AbstractBaseUser,PermissionsMixin
+)
+from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
 
 # Create your models here.
 class Customer(models.Model):
     '''客户'''
-    name = models.CharField(max_length=32,blank=True,null=True)   #可以存取32个字节
+    name = models.CharField(max_length=32,blank=True,null=True,help_text='用户报名后请修改为真是的姓名.')   #可以存取32个字节
     qq = models.CharField(max_length=64,unique=True)
     qq_name = models.CharField(max_length=64,blank=True,null=True)
     phone = models.CharField(max_length=64,blank=True,null=True)
@@ -21,7 +26,7 @@ class Customer(models.Model):
     consult_course = models.ForeignKey("Course",verbose_name='咨询课程',on_delete=models.CASCADE)
     content = models.TextField(verbose_name='咨询详情')
     tags = models.ManyToManyField('Tag')
-    consultant = models.ForeignKey('UserProfile',on_delete=models.CASCADE)
+    consultant = models.ForeignKey('UserProfile',on_delete=models.CASCADE,null=True)
     status_choices = ((0, '已报名'), (1, '未报名'), (2, '已退学'))
     status = models.SmallIntegerField(choices=status_choices,default=0)
     date = models.DateTimeField(auto_now_add=True)
@@ -179,7 +184,7 @@ class Enrollment(models.Model):
     '''报名表'''
     customer = models.ForeignKey('Customer',on_delete=models.CASCADE)
     enrolled_class = models.ForeignKey("ClassList",verbose_name="所报班级",on_delete=models.CASCADE)
-    consultanr = models.ForeignKey("UserProfile",verbose_name="课程顾问",on_delete=models.CASCADE)
+    consultant = models.ForeignKey("UserProfile",verbose_name="课程顾问",on_delete=models.CASCADE)
     contract_agreed = models.BooleanField(default=False,verbose_name="学员已同意合同条款")
     contract_approved = models.BooleanField(default=False,verbose_name="合同已经审核")
     date = models.DateTimeField(auto_now_add=True)
@@ -203,16 +208,95 @@ class Payment(models.Model):
         verbose_name = "缴费记录"
         verbose_name_plural = "缴费记录"
 
-class UserProfile(models.Model):
-    '''账号表'''
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+# class UserProfile(models.Model):
+#     '''账号表'''
+#     user = models.OneToOneField(User,on_delete=models.CASCADE)
+#     name = models.CharField(max_length=32)
+#     roles = models.ManyToManyField("Role")
+#     def __str__(self):
+#         return self.name
+#     class Meta:
+#         #verbose_name = "账号表"
+#         verbose_name_plural = "账号"
+#
+class UserProfileManager(BaseUserManager):
+    def create_user(self, email, name, password=None):
+        """
+        Creates and saves a User with the given email, date of
+        birth and password.
+        """
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            name=name,
+        )
+        self.is_active = True
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, name, password):
+        """
+        Creates and saves a superuser with the given email, date of
+        birth and password.
+        """
+        user = self.create_user(
+            email,
+            password=password,
+            name=name,
+        )
+        user.is_active = True
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+class UserProfile(AbstractBaseUser,PermissionsMixin):
+    email = models.EmailField(
+        verbose_name='email address',
+        max_length=255,
+        unique=True,
+    )
+    password = models.CharField(_('password'), max_length=128,
+                                help_text=mark_safe('''<a href='password/'>点击修改密码</a>'''))
     name = models.CharField(max_length=32)
-    roles = models.ManyToManyField("Role")
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    roles = models.ManyToManyField("Role",blank=True)
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+
+    def get_full_name(self):
+        # The user is identified by their email address
+        return self.email
+
+    def get_short_name(self):
+        # The user is identified by their email address
+        return self.email
+
+    def __str__(self):              # __unicode__ on Python 2
+        return self.email
+
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    def has_module_perms(self, app_label):
+        "Does the user have permissions to view the app `app_label`?"
+        # Simplest possible answer: Yes, always
+        return True
+
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
     def __str__(self):
         return self.name
-    class Meta:
-        #verbose_name = "账号表"
-        verbose_name_plural = "账号"
 class Role(models.Model):
     '''角色表'''
     name = models.CharField(max_length=32,unique=True)
@@ -226,6 +310,8 @@ class Role(models.Model):
 class Menu(models.Model):
     '''菜单'''
     name = models.CharField(max_length=32)
+    url_type_choices = ((0,'alias'),(1,'absolute_url'))
+    url_type = models.SmallIntegerField(choices=url_type_choices,default=0)
     url_name = models.CharField(max_length=64)
 
     def __str__(self):

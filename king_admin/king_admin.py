@@ -9,17 +9,46 @@ class BaseAdmin(object):
     search_fields = []
     list_per_page = 5
     ordering = None
-    filter_horizontal = ['tags']
+    filter_horizontal = []
+    modelform_exculde_fields = []
+    def default_form_validation(self):
+        '''用户可以在这里自定义表单验证，相当于django form的clean方法'''
+        pass
+
 class CustomerAdmin(BaseAdmin):
-    list_display = ['id', 'qq', 'name', 'source', 'consultant', 'date', 'consult_course', 'status']
+    list_display = ['id', 'qq', 'name', 'source', 'consultant', 'date', 'consult_course', 'status','enroll']
     list_filters = ['source', 'consultant', 'consult_course', 'status', 'date']
     list_per_page = 5
     search_fields = ['qq', 'name', 'consultant__name']
     filter_horizontal = ['tags']
+    readonly_fields=['qq',"consultant",'tags']
+    modelform_exculde_fields = []
+    def enroll(self):
+        return '''<a href="/crm/customer/%s/enrollment/">报名</a>''' % self.instance.id
+    enroll.display_name = "报名链接"
+    def default_form_validation(self):
+        consult_content = self.cleaned_data.get("content")
+        if len(consult_content) < 15:
+            return self.ValidationError(
+                    ('Field %(field)s 咨询内容记录不能少于15个字符!'),
+                    code='invalid',
+                    params={'field': 'content'}
+            )
+    def clean_name(self):
+        #print("name-------------------",self.cleaned_data['name'])
+        if not self.cleaned_data['name']:
+            self.add_error('name','不能为空')
+
 
 
 class CustomerFollowUpAdmin(BaseAdmin):
     list_display = ('customer', 'consultant', 'date')
+
+class UserProfileAdmin(BaseAdmin):
+    list_display = ('email','name')
+    readonly_fields = ('password',)
+    modelform_exculde_fields = ['last_login',]
+    filter_horizontal = ('user_permissions','groups')
 
 
 def register(model_class, admin_class=None):
@@ -32,3 +61,4 @@ def register(model_class, admin_class=None):
 
 register(models.Customer, CustomerAdmin)
 register(models.CustomerFollowUp, CustomerFollowUpAdmin)
+register(models.UserProfile, UserProfileAdmin)
